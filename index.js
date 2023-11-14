@@ -1,6 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
+require ('./utils/mongoConnection');
+
 const moviesRouter = require('./routers/movies.router');
 const app = express();
 const port = 3003;

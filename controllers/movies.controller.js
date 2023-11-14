@@ -1,8 +1,12 @@
-exports.getMovies = (req, res) => {
+const Movie = require('../models/movie.model');
+
+exports.getMovies = async(req, res) => {
     try{
+        const movies = await Movie.find();
         return res.status(200).json(
             {
-                message: "Consultando peliculas"
+                message: "Consultando peliculas",
+                data: movies
             }
         );
     }catch(error){
@@ -13,12 +17,14 @@ exports.getMovies = (req, res) => {
         );
     }
 }
-exports.getMovieById = (req, res) => {
+exports.getMovieById = async(req, res) => {
+    const MovieId = req.params.MovieId;
     try{
-        const MovieId = req.params.MovieId;
+        const movie = await Movie.findById(MovieId);
         return res.status(200).json(
             {
-                message: "Consultando pelicula por Id: "+ MovieId
+                message: "Pelicula obtenida con éxito ",
+                data: movie
             }
         );
     }catch(error){
@@ -31,9 +37,12 @@ exports.getMovieById = (req, res) => {
     }
 }
 
-exports.newMovie = (req, res) => {
+exports.newMovie = async(req, res) => {
     try{
-        const newMovie= req.body;
+        const {id, nombre, director, anio, duracion, genero} = req.body;
+        const newMovie = new Movie({id, nombre, director, anio, duracion, genero});
+        await newMovie.save();
+
         return res.status(200).json(
             {
                 message: "Pelicula creada",
@@ -50,10 +59,12 @@ exports.newMovie = (req, res) => {
     }
 }
 
-exports.updateMovie = (req, res) => {
+exports.updateMovie = async (req, res) => {
+    const MovieId = req.params.MovieId;
+    const newData = req.body;
+
     try{
-        const MovieId = req.params.MovieId;
-        const updateMovie = req.body;
+        const updateMovie = await Movie.findByIdAndUpdate(MovieId, newData, {new: true});
         return res.status(201).json(
             {
                 message: "Actualizar pelicula por Id: "+ MovieId,
@@ -69,9 +80,10 @@ exports.updateMovie = (req, res) => {
         );
     }
 }
-exports.deleteMovie= (req, res) => {
+exports.deleteMovie= async(req, res) => {
+    const MovieId = req.params.MovieId;
     try{
-        const MovieId = req.params.MovieId;
+        await Movie.findByIdAndDelete(MovieId);
         return res.status(200).json(
             {
                 message: "Pelicula eliminada por Id: "+ MovieId
